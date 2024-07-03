@@ -1,21 +1,75 @@
-# Create a variable called 'name' that holds a string
+"""
+Module 3 Challenge - PyBank 
 
-# Create a variable called 'country' that holds a string
+Due: Jul 15, 2024 by 11:59pm
 
-# Create a variable called 'age' that holds an integer
+@author: Steph Abegg
+"""
 
-# Create a variable called 'hourly_wage' that holds an integer
+# modules
+import csv
+import os
 
-# Calculate the daily wage for the user
+# path to csv file
+budget_data_csv = os.path.join("Resources", "budget_data.csv")
 
-# Create a variable called 'satisfied' that holds a boolean
+# lists to store data
+date = []
+profit_loss = []
+changes = []
 
-# Print out "Hello <name>!"
+# open csv file
+with open(budget_data_csv) as csvfile:
+    csvreader = csv.reader(csvfile, delimiter=",")
 
-# Print out what country the user entered
+    # grab column headers
+    header = []
+    header = next(csvreader) # Date, Profit/Losses
+    
+    # read rows into lists
+    for row in csvreader:
+        # add date
+        date.append(row[0])
+        # add profit/loss
+        profit_loss.append(int(row[1]))
 
-# Print out the user's age
+# find monthly change, max increase, max decrease     
+num_rows = len(date)
+max_increase = 0
+max_decrease = 0
+max_increase_month = ""
+max_decrease_month = ""
+for i in range(1, num_rows):
+    change = profit_loss[i]-profit_loss[i-1]
+    changes.append(change)
+    if change > max_increase:
+        max_increase = change
+        max_increase_month = date[i]
+    if change < max_decrease:
+        max_decrease = change
+        max_decrease_month = date[i]
 
-# With an f-string, print out the daily wage that was calculated
+# compute desired output
+month_count = len(set(date))
+total_profit = sum(profit_loss)
+avg_change = sum(changes)/(num_rows-1) 
 
-# With an f-string, print out whether the users were satisfied
+# create list of output strings
+L = [
+     "Financial Analysis",
+     "----------------------------", 
+     f"Total Months: {month_count}",
+     f"Total: ${total_profit:,}",
+     f"Average Change: ${avg_change:,.2f}",
+     f"Greatest Increase in Profits: {max_increase_month} (${max_increase:,})",
+     f"Greatest Decrease in Profits: {max_decrease_month} (${max_decrease:,})"
+     ]
+
+# ouput to file
+output_file = open("analysis/output_PyBank.txt","w")
+output_file.writelines(line + '\n' for line in L)
+output_file.close()
+
+# print output as well
+for row in L:
+    print(row)
